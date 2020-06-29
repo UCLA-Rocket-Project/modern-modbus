@@ -21,3 +21,7 @@ the folder's targets to your own.
 The following two targets are included in the CMakeLists.txt:
 * `modern-modbus-core`: this library contains the core modbus implementation and parser
 * `modern-modbus-tcp`: this library contains the server implementation for Modbus/TCP 
+
+## Testing
+One program I found useful for testing the compliance of the server is 
+[RMMS](http://en.radzio.dxp.pl/modbus-master-simulator/).
