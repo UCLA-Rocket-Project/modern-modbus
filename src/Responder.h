@@ -16,7 +16,7 @@ namespace modbus {
 	void defaultBoolSetter(uint16_t a, bool b);
 	void defaultShortSetter(uint16_t a, uint16_t s);
 
-	using SenderStream = std::function<void(const uint8_t* msg, int len)>;
+	using SenderStream = std::function<void(uint8_t funcCode, const uint8_t* msg, int len)>;
 	struct Accessors {
 		Getter<bool> getBool = defaultBoolGetter;
 		Setter<bool> setBool = defaultBoolSetter;
@@ -40,7 +40,6 @@ namespace modbus {
 		Responder(Frame frame, SenderStream send): frame(std::move(frame)), send(std::move(send)) {};
 		void respWithAccessors(Accessors &accessors);
 		void respWithException(ModbusException exception);
-		void respWithRaw(uint8_t *msg, int len);
 	private:
 		SenderStream send;
 	};

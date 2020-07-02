@@ -69,6 +69,7 @@ int main (int argc, char *argv[]) {
 	// to initialize the server, provide a port and a modbus callback.
 	// RAII means the server will automatically close its internal ports on deallocation
 	ModbusTCPServer server(5020, mbCallback);
+	cout << "Server started on port 5020!" << endl;
 	// to be compatible with what ever event loop you prefer, the server only checks its epoll when you call server.tick()
 	while(true) {
 		server.tick();

@@ -11,6 +11,7 @@ target_link_libraries(modern-modbus-tcp modern-modbus-core)
 
 option(BUILD_EXAMPLE "set to ON if you want to build the example")
 if(BUILD_EXAMPLE)
+    add_definitions(-DWTF_IS_HAPPENING)
     add_executable(modern-modbus-tcp-example example/main.cpp)
     target_link_libraries(modern-modbus-tcp-example modern-modbus-core modern-modbus-tcp)
 endif()

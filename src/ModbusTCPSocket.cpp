@@ -103,8 +103,8 @@ void ModbusTCPSocket::readByte(uint8_t c) {
 		if(bytesRead == numBytes) {
 			if(done) {
 				// need a lambda to call sendResponse with a "this" context
-				cb(Responder(frame, [&](const uint8_t* msg, int len) {
-					sendResponse(msg, len);
+				cb(Responder(frame, [&](uint8_t func, const uint8_t* msg, int len) {
+					sendResponse(func, msg, len);
 				}));
 				reset();
 			}
@@ -179,14 +179,23 @@ void hexDump(char *desc, void *addr, int len) {
 }
 #endif
 
-void ModbusTCPSocket::sendResponse(const uint8_t *msg, int len) {
+void ModbusTCPSocket::sendResponse(uint8_t func, const uint8_t *msg, int len) {
 	// set up the byte manipulation hackery
-	uint8_t respHeader[7] = { 0 };
-	uint16_t *respShort = (uint16_t*)respHeader;
+	uint8_t resp[8 + len]; // probably do a overflow check on this addition
+	uint16_t *respShort = (uint16_t*)resp;
 	respShort[0] = htobe16(transactionId);
 	respShort[1] = 0;
-	respShort[2] = htobe16(1+len);
-	respHeader[6] = slaveId;
+	respShort[2] = htobe16(2+len);
+	resp[6] = slaveId;
+	resp[7] = func;
+	memcpy(resp + 8, msg, len);
+
+	uint8_t finalLen = 8 + len;
+
+#ifdef WTF_IS_HAPPENING
+	hexDump("Transmitting: ", resp, finalLen);
+	putchar('\n');
+#endif
 
 	// we swap the socket into blocking mode during the write (i dont want any loops)
 	int flags = fcntl(sockFd, F_GETFL, 0);
@@ -195,10 +204,7 @@ void ModbusTCPSocket::sendResponse(const uint8_t *msg, int len) {
 		throw runtime_error(string("Could not put socket into blocking mode: ") + strerror(errno));
 	}
 
-	if(send(sockFd, respHeader, 7, 0) < 0) {
-		throw runtime_error(string("Error sending msg header: ") + strerror(errno));
-	}
-	if(send(sockFd, msg, len, 0) < 0) {
+	if(send(sockFd, resp, finalLen, 0) < 0) {
 		throw runtime_error(string("Error sending msg data: ") + strerror(errno));
 	}
 
@@ -206,14 +212,6 @@ void ModbusTCPSocket::sendResponse(const uint8_t *msg, int len) {
 	if(fcntl(sockFd, F_SETFL, flags) < 0) {
 		throw runtime_error(string("Could not put socket back into non-blocking mode: ") + strerror(errno));
 	}
-
-#ifdef WTF_IS_HAPPENING
-	printf("RECEIVED ARGS: transaction: %d, recvdLen: %d\n", transactionId, numBytes);
-	hexDump("HEADER", respHeader, 7);
-	putchar('\n');
-	hexDump("DATA", (void*)msg, len);
-	putchar('\n');
-#endif
 }
 
 void ModbusTCPSocket::reset() {

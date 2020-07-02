@@ -31,7 +31,7 @@ namespace modbus {
 		uint16_t numBytes = 0;
 		uint16_t bytesRead = 0;
 		int sockFd;
-		void sendResponse(const uint8_t *msg, int len);
+		void sendResponse(uint8_t func, const uint8_t *msg, int len);
 	};
 }
 
