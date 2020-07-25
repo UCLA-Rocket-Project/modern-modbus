@@ -1,6 +1,6 @@
 # Modern Modbus
 A library for programming in 2020 with a protocol made in 1979 using a
-C++ standard from 1999.
+C standard from 1999 and a C++ standard from 2014.
 
 ## Motivation
 This library was created to provide a more intuitive interface to making a Modbus TCP server than
@@ -17,6 +17,8 @@ PRs welcome if you come across any non-compliance.
 ## Usage / Integration
 The folder is a standard CMake project, so just put it in your repo and use `add_subdirectory` to add
 the folder's targets to your own.
+
+Check the dependency chain in `CMakeLists.txt` to make sure you're linking everything correctly.
 
 The following three targets are included in the CMakeLists.txt:
 * `modern-modbus-core`: A C99 compatible implementation of a modbus command parser (no framing support)
