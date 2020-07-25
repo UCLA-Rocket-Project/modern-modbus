@@ -15,7 +15,7 @@ map<MB_WORD, MB_WORD> regs;
 
 // the getters will return the written value if it exists in "regs", else it will just return some random default
 bool getBool(MB_WORD addr) {
-	return regs.find(addr) == regs.end() ? (addr % 2 != 0) : !!regs[addr];
+	return regs.find(addr) == regs.end() ? (addr % 2 != 0) : (regs[addr] != 0);
 }
 MB_WORD getWord(MB_WORD addr) {
 	return regs.find(addr) == regs.end() ? addr % 2 : regs[addr];
